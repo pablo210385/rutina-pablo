@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rutina Enjoy — Full Body A/B/C</title>
+    <style>
+        :root {
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --primary: #10b981;
+            --primary-light: #ecfdf5;
+            --accent-alt: #3b82f6;
+            --accent-alt-light: #eff6ff;
+            --warn: #f59e0b;
+            --warn-light: #fffbeb;
+            --border-radius: 16px;
+        }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            padding: 15px;
+            padding-bottom: 90px;
+        }
+        .container { max-width: 600px; margin: 0 auto; }
+        header {
+            text-align: center;
+            margin-bottom: 16px;
+            padding: 20px;
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            color: white;
+            border-radius: var(--border-radius);
+        }
+        header h1 { font-size: 1.4rem; margin-bottom: 5px; }
+        header p { color: #94a3b8; font-size: 0.82rem; }
+        .rules {
+            background: var(--warn-light);
+            border: 1px solid #fde68a;
+            border-radius: 12px;
+            padding: 10px 14px;
+            font-size: 0.8rem;
+            color: #92400e;
+            margin-bottom: 16px;
+            line-height: 1.5;
+        }
+        /* Tabs de día */
+        .day-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+            position: sticky;
+            top: 8px;
+            z-index: 50;
+        }
+        .day-tab {
+            flex: 1;
+            padding: 12px 6px;
+            border: 1px solid #e2e8f0;
+            background: var(--card-bg);
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            text-align: center;
+            box-shadow: 0 2px 6px rgba(15,23,42,0.06);
+        }
+        .day-tab small { display: block; font-weight: 500; font-size: 0.68rem; margin-top: 2px; }
+        .day-tab.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+        .day-tab.active small { color: #d1fae5; }
+        .day-progress {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-align: center;
+            margin-bottom: 12px;
+        }
+        .day-note {
+            background: var(--accent-alt-light);
+            border-left: 3px solid var(--accent-alt);
+            border-radius: 8px;
+            padding: 10px 12px;
+            font-size: 0.82rem;
+            color: #1e3a8a;
+            margin-bottom: 14px;
+        }
+        .exercise-card {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            padding: 16px;
+            margin-bottom: 12px;
+            border: 1px solid #e2e8f0;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+        .check-wrap { cursor: pointer; padding-top: 2px; }
+        .real-checkbox { display: none; }
+        .custom-checkbox {
+            width: 26px; height: 26px;
+            border: 2px solid #cbd5e1;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s ease;
+            background-color: white;
+            flex-shrink: 0;
+        }
+        .custom-checkbox::after {
+            content: "✓"; color: white; font-weight: bold; font-size: 14px; display: none;
+        }
+        .real-checkbox:checked + .custom-checkbox {
+            background-color: var(--primary);
+            border-color: var(--primary);
+        }
+        .real-checkbox:checked + .custom-checkbox::after { display: block; }
+        .exercise-card.done .exercise-content { opacity: 0.45; }
+        .exercise-card.done .exercise-name { text-decoration: line-through; }
+        .exercise-content { flex: 1; transition: opacity 0.2s ease; }
+        .exercise-header {
+            display: flex; justify-content: space-between; align-items: flex-start;
+            margin-bottom: 6px; gap: 10px;
+        }
+        .exercise-name { font-size: 1.02rem; font-weight: 700; }
+        .exercise-meta {
+            font-size: 0.8rem; font-weight: 700;
+            background-color: var(--primary-light); color: var(--primary);
+            padding: 3px 8px; border-radius: 6px; white-space: nowrap;
+        }
+        .tempo-badge {
+            font-size: 0.75rem; color: var(--text-muted);
+            background-color: #f1f5f9; padding: 2px 6px;
+            border-radius: 4px; display: inline-block; margin-top: 2px;
+        }
+        .video-link {
+            display: inline-flex; align-items: center; gap: 5px;
+            margin-top: 8px; margin-right: 8px;
+            font-size: 0.78rem; font-weight: 700;
+            color: #dc2626; background: #fef2f2;
+            border: 1px solid #fecaca; border-radius: 20px;
+            padding: 4px 12px; text-decoration: none;
+        }
+        .video-link:active { transform: scale(0.96); }
+        .weight-row {
+            display: flex; align-items: center; gap: 8px;
+            margin-top: 10px;
+        }
+        .weight-row label { font-size: 0.75rem; color: var(--text-muted); font-weight: 600; }
+        .weight-input {
+            width: 80px; padding: 6px 8px;
+            border: 1px solid #e2e8f0; border-radius: 8px;
+            font-size: 0.9rem; font-weight: 700; color: var(--text-main);
+            text-align: center;
+        }
+        .weight-input:focus { outline: 2px solid var(--primary); border-color: var(--primary); }
+        .pr-flash {
+            font-size: 0.72rem; font-weight: 700; color: var(--primary);
+            display: none;
+        }
+        .pr-flash.show { display: inline; }
+        .alternatives-container {
+            margin-top: 10px; padding-top: 10px;
+            border-top: 1px dashed #e2e8f0;
+        }
+        .alt-title {
+            font-size: 0.72rem; text-transform: uppercase; font-weight: 700;
+            color: var(--text-muted); margin-bottom: 6px;
+        }
+        .alt-box { display: flex; flex-direction: column; gap: 6px; }
+        .alt-item {
+            font-size: 0.85rem; padding: 6px 10px;
+            background-color: var(--accent-alt-light);
+            border-left: 3px solid var(--accent-alt);
+            border-radius: 4px; color: #1e3a8a;
+            display: flex; align-items: center; justify-content: space-between; gap: 8px;
+        }
+        .alt-video {
+            text-decoration: none; font-size: 0.95rem;
+            padding: 2px 8px; border-radius: 12px;
+            background: #fef2f2; border: 1px solid #fecaca;
+            flex-shrink: 0;
+        }
+        .alt-video:active { transform: scale(0.92); }
+        .reset-btn {
+            position: fixed; bottom: 20px; right: 20px;
+            background-color: #ef4444; color: white; border: none;
+            padding: 12px 20px; border-radius: 30px;
+            font-weight: bold; font-size: 0.9rem;
+            box-shadow: 0 4px 10px rgba(239, 68, 68, 0.4);
+            cursor: pointer; display: flex; align-items: center; gap: 8px;
+            z-index: 100;
+        }
+        .reset-btn:active { transform: scale(0.95); }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header>
+        <a href="./index.html" style="display:inline-block;margin-bottom:10px;color:#94a3b8;text-decoration:none;font-size:14px;">&larr; Volver a la app</a>
+        <h1>Rutina Enjoy — Full Body A/B/C</h1>
+        <p>Martes A · Jueves B · Finde C · Los pesos y checks se guardan solos</p>
+    </header>
+
+    <div class="rules">
+        <strong>Reglas:</strong> termina cada serie a 1–2 reps del fallo (RIR 1–2) · Descansos: 90–120s en básicos, 60s en aislamiento · Cuando completes el tope de reps en todas las series → sube peso.
+    </div>
+
+    <div class="day-tabs" id="dayTabs"></div>
+    <div class="day-progress" id="dayProgress"></div>
+    <div class="day-note" id="dayNote"></div>
+    <div id="exerciseList"></div>
+</div>
+
+<button class="reset-btn" onclick="resetDay()">🔄 Reiniciar día</button>
+
+<script>
+const RUTINA = {
+    A: {
+        label: "Día A",
+        sub: "Martes · Empuje",
+        note: "🧖 Sauna después de entrenar. Énfasis en empuje: pierna pesada + pecho + hombro.",
+        exercises: [
+            { name: "Prensa de piernas", meta: "4 × 8-12", tempo: "Tempo lento (3s bajada)", alts: ["Multipower (sentadilla)", "Sentadilla goblet con mancuerna"] },
+            { name: "Chest press máquina", meta: "4 × 6-10", tempo: "Fotos 1000412143 / 1000412144", alts: ["Press plano con mancuernas", "Press de pecho en poleas"] },
+            { name: "Jalón al pecho", meta: "3 × 10-12", tempo: "", alts: ["Máquina jalón divergente", "Jalón unilateral de rodillas"] },
+            { name: "Press hombro máquina", meta: "3 × 8-12", tempo: "", alts: ["Press militar con mancuernas", "Press hombro unilateral polea"] },
+            { name: "Elevaciones laterales polea", meta: "3 × 12-15", tempo: "Cable por delante (Foto 1000412148)", alts: ["Laterales con mancuerna (sentado)", "Máquina de hombro lateral"] },
+            { name: "Extensión tríceps cuerda", meta: "2 × 12", tempo: "", alts: ["Barra recta/V en polea", "Extensión tras nuca con mancuerna"] },
+            { name: "Pallof press (core)", meta: "2 × 12 /lado", tempo: "", alts: ["Plancha lateral (45s)", "Abdominales bicicleta"] }
+        ]
+    },
+    B: {
+        label: "Día B",
+        sub: "Jueves · Tracción",
+        note: "🧖 Sauna después de entrenar. Énfasis en tracción: cadena posterior + espalda.",
+        exercises: [
+            { name: "Peso muerto rumano (mancuernas)", meta: "4 × 8-12", tempo: "Bajada controlada, espalda neutra", alts: ["RDL en multipower", "Curl femoral tumbado"] },
+            { name: "Remo máquina (apoyo pecho)", meta: "4 × 8-10", tempo: "", alts: ["Remo sentado polea baja (agarre V)", "Remo unilateral con mancuerna"] },
+            { name: "Press inclinado mancuernas", meta: "3 × 8-12", tempo: "", alts: ["Chest press inclinado máquina", "Press inclinado en multipower"] },
+            { name: "Curl femoral sentado", meta: "3 × 10-12", tempo: "", alts: ["Curl femoral tumbado", "Buenos días con mancuernas"] },
+            { name: "Face pulls (polea)", meta: "3 × 15", tempo: "Torre ancha (Foto 1000412154)", alts: ["Máquina aperturas invertidas", "Pájaros con mancuernas"] },
+            { name: "Curl bíceps polea baja", meta: "2 × 12", tempo: "", alts: ["Curl alterno con mancuernas", "Máquina selectora de bíceps"] },
+            { name: "Crunch abdominal polea alta", meta: "2 × 15", tempo: "", alts: ["Máquina selectora de crunch", "Elevaciones de piernas en suelo"] }
+        ]
+    },
+    C: {
+        label: "Día C",
+        sub: "Finde · Global",
+        note: "💧 Hoy mejor hydromasaje que sauna (día con más pierna). Si juegas pádel por la mañana, entrena por la tarde o el día sin pádel.",
+        exercises: [
+            { name: "Hip thrust en multipower", meta: "3 × 8-12", tempo: "Pausa 1s arriba, aprieta glúteo", alts: ["Máquina de glúteo (kickback)", "Hip thrust con mancuerna en banco"] },
+            { name: "Extensión de cuádriceps", meta: "3 × 12-15", tempo: "", alts: ["Prensa (altas repeticiones)", "Zancadas inversas con mancuerna"] },
+            { name: "Jalón agarre neutro", meta: "3 × 10-12", tempo: "", alts: ["Dominadas asistidas", "Pullover en polea alta"] },
+            { name: "Cruces pecho polea alta", meta: "3 × 12-15", tempo: "Torre ancha (Foto 1000412154)", alts: ["Pec Deck / Aperturas máquina", "Aperturas mancuerna inclinado"] },
+            { name: "Gemelos", meta: "3 × 12-15", tempo: "Pausa abajo, sube completo", video: "elevación de talones gemelos de pie", alts: ["Gemelo en prensa", "Gemelo de pie con mancuerna"] },
+            { name: "Press hombro unilateral polea", meta: "2 × 12", tempo: "", alts: ["Elevaciones frontales", "Press Arnold con mancuernas"] }
+        ]
+    }
+};
+
+const STORE_KEY = "rutinaEnjoyABC";
+let currentDay = localStorage.getItem(STORE_KEY + ":lastDay") || "A";
+
+function loadState() {
+    try { return JSON.parse(localStorage.getItem(STORE_KEY)) || {}; }
+    catch (e) { return {}; }
+}
+function saveState(state) {
+    localStorage.setItem(STORE_KEY, JSON.stringify(state));
+}
+function exKey(day, i) { return day + ":" + i; }
+
+function videoUrl(ex) {
+    const query = (ex.video || ex.name) + " técnica ejercicio shorts";
+    return "https://www.youtube.com/results?search_query=" + encodeURIComponent(query);
+}
+
+function renderTabs() {
+    const tabs = document.getElementById("dayTabs");
+    tabs.innerHTML = "";
+    Object.keys(RUTINA).forEach(day => {
+        const btn = document.createElement("button");
+        btn.className = "day-tab" + (day === currentDay ? " active" : "");
+        btn.innerHTML = RUTINA[day].label + "<small>" + RUTINA[day].sub + "</small>";
+        btn.onclick = () => { currentDay = day; localStorage.setItem(STORE_KEY + ":lastDay", day); render(); };
+        tabs.appendChild(btn);
+    });
+}
+
+function renderProgress(state) {
+    const total = RUTINA[currentDay].exercises.length;
+    let done = 0;
+    RUTINA[currentDay].exercises.forEach((_, i) => {
+        if (state[exKey(currentDay, i)]?.done) done++;
+    });
+    document.getElementById("dayProgress").textContent =
+        done === total && total > 0 ? "✅ Sesión completada — a la sauna/spa"
+        : done + " de " + total + " ejercicios hechos";
+}
+
+function render() {
+    const state = loadState();
+    renderTabs();
+    renderProgress(state);
+    document.getElementById("dayNote").textContent = RUTINA[currentDay].note;
+
+    const list = document.getElementById("exerciseList");
+    list.innerHTML = "";
+
+    RUTINA[currentDay].exercises.forEach((ex, i) => {
+        const key = exKey(currentDay, i);
+        const exState = state[key] || {};
+
+        const card = document.createElement("div");
+        card.className = "exercise-card" + (exState.done ? " done" : "");
+
+        const altsHtml = ex.alts.map((a, idx) =>
+            '<div class="alt-item"><strong>' + String.fromCharCode(65 + idx) + ':</strong> ' + a +
+            ' <a class="alt-video" target="_blank" rel="noopener" href="' + videoUrl({ name: a }) + '">🎥</a></div>'
+        ).join("");
+
+        card.innerHTML =
+            '<label class="check-wrap">' +
+                '<input type="checkbox" class="real-checkbox" ' + (exState.done ? "checked" : "") + '>' +
+                '<div class="custom-checkbox"></div>' +
+            '</label>' +
+            '<div class="exercise-content">' +
+                '<div class="exercise-header">' +
+                    '<span class="exercise-name">' + (i + 1) + '. ' + ex.name + '</span>' +
+                    '<span class="exercise-meta">' + ex.meta + '</span>' +
+                '</div>' +
+                (ex.tempo ? '<span class="tempo-badge">' + ex.tempo + '</span>' : '') +
+                '<div><a class="video-link" target="_blank" rel="noopener" href="' + videoUrl(ex) + '">🎥 Ver técnica</a></div>' +
+                '<div class="weight-row">' +
+                    '<label>Peso hoy (kg):</label>' +
+                    '<input type="number" inputmode="decimal" step="0.5" min="0" class="weight-input" value="' + (exState.weight ?? "") + '" placeholder="—">' +
+                    '<span class="pr-flash">🏆 ¡PR!</span>' +
+                '</div>' +
+                '<div class="alternatives-container">' +
+                    '<div class="alt-title">Alternativas si está ocupada:</div>' +
+                    '<div class="alt-box">' + altsHtml + '</div>' +
+                '</div>' +
+            '</div>';
+
+        const checkbox = card.querySelector(".real-checkbox");
+        checkbox.addEventListener("change", () => {
+            const s = loadState();
+            s[key] = s[key] || {};
+            s[key].done = checkbox.checked;
+            saveState(s);
+            card.classList.toggle("done", checkbox.checked);
+            renderProgress(s);
+        });
+
+        const weightInput = card.querySelector(".weight-input");
+        const prFlash = card.querySelector(".pr-flash");
+        weightInput.addEventListener("change", () => {
+            const s = loadState();
+            s[key] = s[key] || {};
+            const newW = parseFloat(weightInput.value);
+            if (!isNaN(newW)) {
+                const prevBest = s[key].best ?? 0;
+                if (newW > prevBest) {
+                    s[key].best = newW;
+                    prFlash.classList.add("show");
+                    setTimeout(() => prFlash.classList.remove("show"), 3000);
+                }
+                s[key].weight = newW;
+            } else {
+                delete s[key].weight;
+            }
+            saveState(s);
+        });
+
+        list.appendChild(card);
+    });
+}
+
+function resetDay() {
+    if (!confirm("¿Reiniciar los checks del " + RUTINA[currentDay].label + "? (Los pesos y PRs se conservan)")) return;
+    const state = loadState();
+    RUTINA[currentDay].exercises.forEach((_, i) => {
+        const key = exKey(currentDay, i);
+        if (state[key]) state[key].done = false;
+    });
+    saveState(state);
+    render();
+}
+
+render();
+</script>
+</body>
+</html>

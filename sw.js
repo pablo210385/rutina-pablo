@@ -1,7 +1,8 @@
-const CACHE_NAME = "rutina-pablo-v4";
+const CACHE_NAME = "rutina-pablo-v5";
 const FILES_TO_CACHE = [
   "./",
   "./index.html",
+  "./enjoy.html",
   "./manifest.json",
   "./icon-192.png",
   "./icon-512.png"
