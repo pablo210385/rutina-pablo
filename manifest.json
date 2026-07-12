@@ -4,8 +4,8 @@
   "description": "Plan diario personalizado de nutrición y entrenamiento",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#06080f",
-  "theme_color": "#06080f",
+  "background_color": "#f8fafc",
+  "theme_color": "#f8fafc",
   "orientation": "portrait",
   "icons": [
     {
