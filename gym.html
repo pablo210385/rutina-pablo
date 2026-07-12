@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Rutina Gimnasio — Pablo García · Enjoy Oviedo</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#06080f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Gym Pablo">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#06080f; --surface:#0d1117; --surface2:#131920;
+  --border:rgba(255,255,255,0.06); --text:#e8edf5;
+  --muted:#4a5568; --dim:#2d3748;
+  --espalda:#38bdf8; --pecho:#f97316; --piernas:#4ade80; --hombros:#a78bfa;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Syne',sans-serif;min-height:100vh;overflow-x:hidden;padding-bottom:80px}
+body::before{content:'';position:fixed;top:-30%;left:-20%;width:70%;height:70%;background:radial-gradient(ellipse,rgba(56,189,248,0.04) 0%,transparent 70%);pointer-events:none;z-index:0}
+body::after{content:'';position:fixed;bottom:-20%;right:-20%;width:60%;height:60%;background:radial-gradient(ellipse,rgba(167,139,250,0.04) 0%,transparent 70%);pointer-events:none;z-index:0}
+
+/* SCREENS */
+.screen{display:none;min-height:100vh;position:relative;z-index:1}
+.screen.active{display:block}
+
+/* BOTTOM NAV */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:rgba(6,8,15,0.95);backdrop-filter:blur(20px);border-top:1px solid var(--border);display:flex;z-index:200;padding-bottom:env(safe-area-inset-bottom,8px)}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;padding:10px 4px 6px;background:none;border:none;cursor:pointer;color:var(--muted);font-family:'DM Mono',monospace;font-size:9px;letter-spacing:0.5px;text-transform:uppercase;transition:color 0.2s;gap:3px}
+.nav-btn .nav-icon{font-size:18px;line-height:1}
+.nav-btn.active{color:#a78bfa}
+.nav-dot{width:4px;height:4px;border-radius:50%;background:transparent;margin-top:2px}
+.nav-btn.active .nav-dot{background:#a78bfa}
+
+/* HEADER */
+header{background:linear-gradient(180deg,rgba(13,17,23,0.98) 0%,transparent 100%);border-bottom:1px solid var(--border);padding:44px 20px 20px;text-align:center;position:relative;z-index:1}
+.eyebrow{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:5px;color:var(--muted);text-transform:uppercase;margin-bottom:10px}
+h1{font-size:clamp(22px,6vw,40px);font-weight:800;color:#f8fafc;letter-spacing:-1px}
+h1 span{background:linear-gradient(135deg,#a78bfa,#38bdf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.header-meta{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);margin-top:6px}
+
+/* DAY TABS */
+.day-selector{position:sticky;top:0;z-index:100;background:rgba(6,8,15,0.92);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:12px 14px;overflow-x:auto;scrollbar-width:none}
+.day-selector::-webkit-scrollbar{display:none}
+.day-tabs{display:flex;gap:7px;min-width:max-content;margin:0 auto;justify-content:center}
+.day-tab{padding:7px 13px;border-radius:8px;border:1.5px solid var(--border);background:rgba(255,255,255,0.02);color:var(--muted);font-family:'DM Mono',monospace;font-size:11px;cursor:pointer;transition:all 0.2s;white-space:nowrap}
+.day-tab.active{font-weight:600;transform:translateY(-1px);box-shadow:0 4px 20px rgba(0,0,0,0.3)}
+
+/* MAIN */
+main{max-width:720px;margin:0 auto;padding:16px 14px 0;position:relative;z-index:1}
+
+/* SESSION CARD */
+.session-card{border-radius:14px;padding:16px;margin-bottom:14px;border:1px solid}
+.session-meta{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.session-tag{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:2px;text-transform:uppercase;padding:3px 10px;border-radius:100px;border:1px solid}
+.session-title{font-size:20px;font-weight:800;color:#f1f5f9;margin-bottom:4px}
+.session-note{font-size:11px;color:var(--muted);line-height:1.5}
+
+/* WARMUP */
+.warmup-bar{background:rgba(251,191,36,0.08);border:1px solid rgba(251,191,36,0.2);border-radius:10px;padding:10px 14px;margin-bottom:14px;display:flex;gap:10px;align-items:flex-start}
+.warmup-text{font-size:12px;color:#cbd5e1;line-height:1.5}
+
+/* EXERCISE CARDS */
+.ex-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;margin-bottom:8px;overflow:hidden;transition:all 0.2s;cursor:pointer}
+.ex-card:active{transform:scale(0.99)}
+.ex-card.expanded{border-color:rgba(167,139,250,0.3)}
+.ex-header{padding:14px;display:flex;align-items:center;gap:12px}
+.ex-num{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:11px;font-weight:700;flex-shrink:0}
+.ex-info{flex:1}
+.ex-name{font-size:13px;font-weight:700;color:#f1f5f9;margin-bottom:3px}
+.ex-muscle{font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:0.5px}
+.ex-stats{display:flex;gap:10px;flex-shrink:0}
+.ex-stat{text-align:center}
+.ex-stat-val{font-size:13px;font-weight:700}
+.ex-stat-lbl{font-family:'DM Mono',monospace;font-size:7px;color:var(--muted);text-transform:uppercase}
+.ex-detail{padding:0 14px 14px;border-top:1px solid var(--border);display:none}
+.ex-card.expanded .ex-detail{display:block}
+.ex-tip{background:rgba(255,255,255,0.03);border-radius:8px;padding:10px 12px;margin-top:10px}
+.ex-tip-label{font-family:'DM Mono',monospace;font-size:9px;color:#a78bfa;letter-spacing:1px;margin-bottom:5px}
+.ex-tip-text{font-size:12px;color:#b0bec5;line-height:1.6}
+.ex-equipment{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);margin-top:8px}
+
+/* WEIGHT LOGGER inside exercise */
+.weight-logger{margin-top:12px;padding:12px;background:rgba(167,139,250,0.06);border:1px solid rgba(167,139,250,0.15);border-radius:10px}
+.weight-logger-title{font-family:'DM Mono',monospace;font-size:9px;color:#a78bfa;letter-spacing:1px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
+.sets-grid{display:flex;flex-direction:column;gap:6px}
+.set-row{display:flex;align-items:center;gap:8px}
+.set-num{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);width:40px;flex-shrink:0}
+.set-input{background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:6px;padding:6px 8px;color:var(--text);font-family:'DM Mono',monospace;font-size:12px;width:70px;text-align:center}
+.set-input:focus{outline:none;border-color:#a78bfa}
+.set-input::placeholder{color:var(--dim)}
+.set-done{width:28px;height:28px;border-radius:6px;border:1px solid var(--border);background:rgba(255,255,255,0.03);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;transition:all 0.2s}
+.set-done.checked{background:rgba(74,222,128,0.15);border-color:#4ade80}
+.pr-indicator{font-family:'DM Mono',monospace;font-size:9px;color:#fbbf24;background:rgba(251,191,36,0.1);border:1px solid rgba(251,191,36,0.2);padding:2px 6px;border-radius:4px}
+
+/* PROGRESS BAR SESSION */
+.session-progress{margin-bottom:14px}
+.session-progress-track{height:4px;background:rgba(255,255,255,0.05);border-radius:100px;overflow:hidden;margin-bottom:6px}
+.session-progress-fill{height:100%;border-radius:100px;transition:width 0.4s ease}
+.session-progress-text{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);display:flex;justify-content:space-between}
+
+/* FINISHER */
+.finisher-card{background:rgba(167,139,250,0.07);border:1px solid rgba(167,139,250,0.2);border-radius:10px;padding:12px 14px;margin-top:8px;display:flex;gap:10px}
+.finisher-text{font-size:12px;color:#c4b5fd;line-height:1.5}
+
+/* PROGRESSION CARD */
+.progression-wrap{margin-top:16px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px}
+.section-label{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;margin-bottom:14px}
+.prog-row{display:flex;gap:10px;align-items:flex-start;margin-bottom:8px}
+.prog-week{font-family:'DM Mono',monospace;font-size:9px;padding:2px 7px;border-radius:4px;flex-shrink:0;white-space:nowrap}
+.prog-text{font-size:11px;color:#94a3b8;line-height:1.5}
+.prog-text strong{color:#f1f5f9}
+
+/* HISTORIAL SCREEN */
+.historial-wrap{padding:16px 14px;max-width:720px;margin:0 auto}
+.historial-day-sel{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px}
+.hist-day-btn{padding:7px 14px;border-radius:8px;border:1.5px solid var(--border);background:rgba(255,255,255,0.02);color:var(--muted);font-family:'DM Mono',monospace;font-size:10px;cursor:pointer;transition:all 0.2s;white-space:nowrap}
+.hist-day-btn.active{font-weight:700}
+.hist-session{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:8px}
+.hist-session-date{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);margin-bottom:8px}
+.hist-ex-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border)}
+.hist-ex-row:last-child{border-bottom:none}
+.hist-ex-name{font-size:12px;color:#f1f5f9}
+.hist-ex-vals{font-family:'DM Mono',monospace;font-size:10px;color:#a78bfa}
+.empty-state{text-align:center;padding:40px 20px;color:var(--muted);font-family:'DM Mono',monospace;font-size:11px}
+
+/* RECUPERACIÓN */
+.recup-wrap{padding:16px 14px;max-width:720px;margin:0 auto}
+.week-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:20px}
+.week-cell{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 4px;text-align:center;cursor:pointer;transition:all 0.2s}
+.week-cell:active{transform:scale(0.96)}
+.week-cell.active-day{border-width:2px}
+.week-cell-day{font-family:'DM Mono',monospace;font-size:8px;color:var(--muted);letter-spacing:0.5px;text-transform:uppercase}
+.week-cell-icon{font-size:16px;margin:4px 0}
+.week-cell-label{font-family:'DM Mono',monospace;font-size:7px;color:var(--muted);line-height:1.3}
+.recup-card{border-radius:14px;padding:16px;margin-bottom:10px;border:1px solid}
+.recup-card-title{font-size:15px;font-weight:700;color:#f1f5f9;margin-bottom:4px;display:flex;align-items:center;gap:8px}
+.recup-card-desc{font-size:12px;color:#94a3b8;line-height:1.6;margin-bottom:12px}
+.recup-protocol{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+.recup-step{display:flex;align-items:center;gap:10px;padding:8px 10px;background:rgba(255,255,255,0.03);border-radius:8px}
+.recup-step-num{font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);width:16px;flex-shrink:0}
+.recup-step-text{font-size:12px;color:#cbd5e1;flex:1}
+.recup-step-time{font-family:'DM Mono',monospace;font-size:10px;white-space:nowrap}
+.timer-wrap{background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:12px;padding:16px;text-align:center}
+.timer-label{font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:10px}
+.timer-display{font-size:52px;font-weight:800;letter-spacing:-2px;margin-bottom:4px;font-family:'DM Mono',monospace}
+.timer-phase{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);margin-bottom:14px}
+.timer-btns{display:flex;gap:8px;justify-content:center}
+.timer-btn{padding:10px 20px;border-radius:10px;border:1px solid;font-family:'Syne',monospace;font-size:13px;font-weight:700;cursor:pointer;transition:all 0.2s}
+.timer-btn:active{transform:scale(0.97)}
+.timer-cycles{display:flex;gap:6px;justify-content:center;margin-top:10px;flex-wrap:wrap}
+.cycle-dot{width:10px;height:10px;border-radius:50%;border:1.5px solid;transition:all 0.3s}
+.cycle-dot.done{border-width:0}
+.recup-tip{background:rgba(251,191,36,0.07);border:1px solid rgba(251,191,36,0.2);border-radius:10px;padding:10px 12px;margin-top:8px;font-size:11px;color:#fcd34d;line-height:1.5}
+
+/* Animations */
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}
+.animate{animation:fadeUp 0.3s ease both}
+.timer-pulse{animation:pulse 1s ease infinite}
+
+::-webkit-scrollbar{width:3px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--dim);border-radius:4px}
+
+@media(max-width:400px){
+  .ex-name{font-size:12px}
+  .ex-stats{gap:8px}
+}
+</style>
+</head>
+<body>
+
+<!-- SCREEN 1: RUTINA -->
+<div class="screen active" id="screen-rutina">
+  <header>
+    <div class="eyebrow">Enjoy Oviedo · Split Verano 2026</div>
+    <h1>Rutina <span>Gimnasio</span></h1>
+    <div class="header-meta">Pablo García · Nivel Intermedio · 4 días/semana</div>
+  </header>
+  <div class="day-selector">
+    <div class="day-tabs" id="dayTabs"></div>
+  </div>
+  <main id="mainContent"></main>
+</div>
+
+<!-- SCREEN 2: HISTORIAL -->
+<div class="screen" id="screen-historial">
+  <header>
+    <div class="eyebrow">Progresión</div>
+    <h1>Histo<span>rial</span></h1>
+    <div class="header-meta">Tus registros de peso por sesión</div>
+  </header>
+  <div class="historial-wrap">
+    <div class="historial-day-sel" id="historialDaySel"></div>
+    <div id="historialContent"></div>
+  </div>
+</div>
+
+<!-- SCREEN 3: RECUPERACIÓN -->
+<div class="screen" id="screen-recup">
+  <header>
+    <div class="eyebrow">Enjoy Oviedo · Spa & Wellness</div>
+    <h1>Recupe<span>ración</span></h1>
+    <div class="header-meta">Sauna · Baño Turco · Hidromasaje</div>
+  </header>
+  <div class="recup-wrap">
+    <div class="section-label">Plan semanal — toca un día</div>
+    <div class="week-grid" id="weekGrid"></div>
+    <div id="recupDayContent"></div>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <button class="nav-btn active" id="nav-rutina" onclick="switchScreen('rutina')">
+    <span class="nav-icon">🏋️</span><span>Rutina</span><div class="nav-dot"></div>
+  </button>
+  <button class="nav-btn" id="nav-recup" onclick="switchScreen('recup')">
+    <span class="nav-icon">🌡️</span><span>Recuperación</span><div class="nav-dot"></div>
+  </button>
+  <button class="nav-btn" id="nav-historial" onclick="switchScreen('historial')">
+    <span class="nav-icon">📈</span><span>Historial</span><div class="nav-dot"></div>
+  </button>
+</nav>
+
+<script>
+// ══════════════════════════════════════════════
+// DATA — SPLIT VERANO ENJOY OVIEDO
+// ══════════════════════════════════════════════
+const SPLIT = [
+  {
+    day: "Lunes", tag: "ESPALDA + BÍCEPS", color: "#38bdf8", icon: "🔵",
+    duration: "~70 min",
+    note: "Empezamos la semana con el grupo muscular más grande. Technogym Oviedo tiene poleas excelentes para dorsales.",
+    warmup: "5 min cinta suave + rotaciones de hombro + pull-aparts con banda elástica 2×15",
+    exercises: [
+      { id:"jalon_ancho", name:"Jalón al Pecho Agarre Ancho", sets:4, reps:"8–10", rest:"90s", muscle:"Dorsal ancho", equipment:"Polea alta Technogym", type:"compound",
+        tip:"Lleva la barra al pecho superior con el pecho orgulloso hacia arriba. No te eches demasiado atrás — el trabajo es de los dorsales, no de la espalda baja." },
+      { id:"remo_maquina", name:"Remo en Máquina Sentado", sets:4, reps:"10–12", rest:"75s", muscle:"Espalda media + romboides", equipment:"Máquina remo Technogym", type:"compound",
+        tip:"Lleva los codos hacia atrás lo máximo posible. Junta las escápulas al final. Suelta lento en 3 segundos — la fase excéntrica construye más músculo." },
+      { id:"remo_unilateral", name:"Remo Unilateral con Mancuerna", sets:3, reps:"10 c/lado", rest:"60s", muscle:"Dorsal + trapecio inferior", equipment:"Mancuerna + banco plano", type:"compound",
+        tip:"Rodilla y mano apoyadas en el banco. Codo bien atrás y arriba. El codo guía el movimiento, no la mano." },
+      { id:"jalon_neutro", name:"Jalón Agarre Neutro (V-bar)", sets:3, reps:"12–14", rest:"60s", muscle:"Dorsal + bíceps", equipment:"Polea alta + V-bar", type:"compound",
+        tip:"Agarre más cercano activa más el bíceps. Buena opción de transición entre espalda y bíceps." },
+      { id:"face_pull", name:"Face Pull en Polea", sets:3, reps:"15–20", rest:"45s", muscle:"Deltoides posterior + manguito rotador", equipment:"Polea alta + cuerda", type:"isolation",
+        tip:"Imprescindible para compensar el trabajo de pecho. Tira hacia la cara, codos arriba y afuera. Protege el hombro para el tenis en octubre." },
+      { id:"curl_barra", name:"Curl Bíceps con Barra", sets:4, reps:"10–12", rest:"60s", muscle:"Bíceps cabeza larga + corta", equipment:"Barra recta o EZ", type:"compound",
+        tip:"Codos pegados al cuerpo. Supina la muñeca al subir para máxima contracción. Baja en 3 segundos." },
+      { id:"curl_martillo", name:"Curl Martillo Mancuernas", sets:3, reps:"12 c/brazo", rest:"45s", muscle:"Braquial + antebrazo", equipment:"Mancuernas", type:"isolation",
+        tip:"Agarre neutro, pulgar arriba. Trabaja el músculo que hay debajo del bíceps — lo hace visualmente más grande." },
+    ],
+    finisher: "Curl en polea baja (cable curl) 2×15 — bombeo final de bíceps con sangre en el músculo",
+  },
+  {
+    day: "Miércoles", tag: "PECHO + TRÍCEPS", color: "#f97316", icon: "🟠",
+    duration: "~70 min",
+    note: "Sesión de empuje. Pecho primero con máxima energía, tríceps al final cuando ya están prefatigados del press.",
+    warmup: "5 min elíptica + rotaciones de hombro amplias + press con goma 2×15 + 1 serie ligera press banca",
+    exercises: [
+      { id:"press_banca", name:"Press Banca Plano con Barra", sets:4, reps:"8–10", rest:"90s", muscle:"Pecho central + tríceps + deltoides anterior", equipment:"Barra + banco plano — zona peso libre", type:"compound",
+        tip:"Escápulas retraídas y deprimidas todo el tiempo. Baja la barra al pecho medio-bajo en 2 segundos. Explota hacia arriba. No bloquees codos arriba del todo." },
+      { id:"press_inclinado", name:"Press Inclinado con Mancuernas", sets:3, reps:"10–12", rest:"75s", muscle:"Pecho superior — la zona más visible", equipment:"Mancuernas + banco inclinado 30–45°", type:"compound",
+        tip:"Ángulo 30° — no más o trabajas demasiado el hombro. Las mancuernas permiten mayor rango de movimiento que la barra. Siente el estiramiento abajo." },
+      { id:"aperturas_polea", name:"Aperturas en Polea Cruzada", sets:3, reps:"12–15", rest:"60s", muscle:"Pecho interior + estiramiento completo", equipment:"Cable crossover Technogym", type:"isolation",
+        tip:"Polea a media altura. Ligera flexión de codo fija. Lo importante es el estiramiento en el punto más abierto — siente cómo se abre el pecho." },
+      { id:"press_maquina", name:"Press de Pecho en Máquina", sets:3, reps:"12–15", rest:"60s", muscle:"Pecho + contracción final", equipment:"Máquina press pecho Technogym", type:"isolation",
+        tip:"Ideal para la parte final cuando la barra ya pesa demasiado. Mantén el pecho apoyado. Pausa 1 segundo en contracción máxima." },
+      { id:"fondos_banco", name:"Fondos en Banco (peso corporal o lastrado)", sets:3, reps:"12–15", rest:"60s", muscle:"Tríceps + pecho inferior", equipment:"Banco plano", type:"compound",
+        tip:"Codos pegados al cuerpo para activar tríceps. Si los abres activas más el pecho. Baja hasta 90° de codo. Lastrate con disco en las piernas si es fácil." },
+      { id:"triceps_polea", name:"Extensiones Tríceps en Polea (cuerda)", sets:3, reps:"12–15", rest:"60s", muscle:"Tríceps cabeza lateral + larga", equipment:"Polea alta + cuerda Technogym", type:"isolation",
+        tip:"Abre la cuerda al final para máxima contracción. Codos completamente fijos al cuerpo. No los dejes volar hacia atrás." },
+      { id:"press_frances", name:"Press Francés con Mancuernas", sets:3, reps:"10–12", rest:"60s", muscle:"Tríceps cabeza larga", equipment:"Mancuernas + banco plano", type:"isolation",
+        tip:"Baja las mancuernas hacia las orejas con control. Codos apuntando al techo siempre. La cabeza larga del tríceps sólo se activa completamente con el brazo levantado." },
+    ],
+    finisher: "Superserie final: aperturas en máquina 15 reps + extensiones tríceps polea 15 reps × 2 rondas sin descanso",
+  },
+  {
+    day: "Viernes", tag: "PIERNAS + GLÚTEOS", color: "#4ade80", icon: "🟢",
+    duration: "~75 min",
+    note: "La sesión más exigente. Viernes es perfecto — descansas sábado y domingo si no hay pádel.",
+    warmup: "5 min bici estática + sentadillas sin peso 2×15 + peso muerto rumano ligero 1×10 + movilidad cadera",
+    exercises: [
+      { id:"sentadilla", name:"Sentadilla Libre con Barra", sets:4, reps:"8–10", rest:"120s", muscle:"Cuádriceps + glúteos + isquios + core", equipment:"Barra + rack de sentadilla", type:"compound",
+        tip:"El rey. Pies al ancho de hombros, puntas ligeramente abiertas. Baja hasta paralelo o más. Rodillas siguen la dirección de los pies. Pecho orgulloso — nunca dejes que la espalda se redondee." },
+      { id:"prensa", name:"Prensa de Piernas 45°", sets:4, reps:"10–12", rest:"90s", muscle:"Cuádriceps + glúteos según posición de pies", equipment:"Máquina prensa Technogym", type:"compound",
+        tip:"Pies altos en la plataforma = más glúteo. Pies bajos = más cuádriceps. Nunca bloquees las rodillas arriba. Baja lento en 3 segundos." },
+      { id:"peso_muerto_rumano", name:"Peso Muerto Rumano con Barra", sets:3, reps:"10–12", rest:"90s", muscle:"Isquiotibiales + glúteos — posterior completo", equipment:"Barra + discos", type:"compound",
+        tip:"Espalda plana siempre. Las rodillas ligeramente flexionadas y fijas. Baja la barra pegada a las piernas hasta sentir el estiramiento en los isquios. Empuja las caderas hacia delante al subir." },
+      { id:"curl_femoral", name:"Curl Femoral Tumbado en Máquina", sets:3, reps:"12–15", rest:"60s", muscle:"Isquiotibiales — aislamiento", equipment:"Máquina curl femoral Technogym", type:"isolation",
+        tip:"Imprescindible para el pádel y para compensar la prensa. Baja en 3 segundos. Protege las rodillas trabajando bien los isquios." },
+      { id:"extensiones", name:"Extensiones de Cuádriceps en Máquina", sets:3, reps:"12–15", rest:"60s", muscle:"Cuádriceps — aislamiento", equipment:"Máquina extensiones Technogym", type:"isolation",
+        tip:"Contrae fuerte 1 segundo arriba. Baja en 3 segundos. Tobillos por encima de las rodillas al final. Para pádel: trabajo unilateral alguna semana para corregir asimetrías." },
+      { id:"zancadas", name:"Zancadas con Mancuernas en Movimiento", sets:3, reps:"10 c/pierna", rest:"75s", muscle:"Glúteos + cuádriceps + estabilizadores", equipment:"Mancuernas", type:"compound",
+        tip:"Clave para pádel — trabajo unilateral y estabilidad lateral. Rodilla trasera cerca del suelo sin tocar. Paso largo para más glúteo, paso corto para más cuádriceps." },
+      { id:"gemelos_maquina", name:"Elevaciones de Gemelos en Máquina", sets:4, reps:"15–20", rest:"45s", muscle:"Gastrocnemio + sóleo", equipment:"Máquina gemelos Technogym", type:"isolation",
+        tip:"Aguanta 1 segundo arriba. Baja hasta sentir el estiramiento completo. Lento. Los gemelos responden mejor a volumen alto y a la variación de velocidad." },
+    ],
+    finisher: "Sentadilla isométrica en pared 3×45 seg — quema final de cuádriceps sin impacto articular",
+  },
+  {
+    day: "Sábado", tag: "HOMBROS + ABDOMINALES", color: "#a78bfa", icon: "🟣",
+    duration: "~60 min",
+    note: "Sesión más corta. Hombros frescos después del descanso del jueves-viernes. Abdominales al final.",
+    warmup: "5 min remo + rotaciones de hombro completas + elevaciones frontales y laterales con goma 2×15",
+    exercises: [
+      { id:"press_militar", name:"Press Militar con Barra de Pie", sets:4, reps:"8–10", rest:"90s", muscle:"Deltoides anterior + medial + tríceps", equipment:"Barra + rack o suelo", type:"compound",
+        tip:"De pie activa el core y es más funcional. Barra desde el pecho, sube hasta arriba. No arquees la espalda baja — aprieta glúteos y abdomen durante todo el movimiento." },
+      { id:"elevaciones_laterales", name:"Elevaciones Laterales con Mancuernas", sets:4, reps:"12–15", rest:"60s", muscle:"Deltoides medial — el que da anchura", equipment:"Mancuernas", type:"isolation",
+        tip:"El ejercicio que más cambia la apariencia del hombro. Peso ligero, perfecto control. Codos ligeramente flexionados. Sube hasta la altura del hombro — no más." },
+      { id:"press_arnold", name:"Press Arnold con Mancuernas", sets:3, reps:"10–12", rest:"75s", muscle:"Deltoides completo — las 3 cabezas", equipment:"Mancuernas + banco con respaldo", type:"compound",
+        tip:"Empieza con palmas mirando hacia ti, gira mientras subes. Activa las 3 cabezas del deltoides en un solo movimiento. Movimiento lento y controlado." },
+      { id:"elevaciones_frontales", name:"Elevaciones Frontales Alternas", sets:3, reps:"12 c/brazo", rest:"60s", muscle:"Deltoides anterior", equipment:"Mancuernas", type:"isolation",
+        tip:"Alterna brazos para más tiempo bajo tensión. Sube hasta la altura del hombro, no más. Evita el balanceo del cuerpo — si lo necesitas, el peso es demasiado." },
+      { id:"pajaros", name:"Pájaros con Mancuernas (inclinado)", sets:3, reps:"15", rest:"60s", muscle:"Deltoides posterior — el más olvidado", equipment:"Mancuernas + banco inclinado", type:"isolation",
+        tip:"Espalda a 45° o tumbado en banco inclinado boca abajo. Codos ligeramente flexionados. El deltoides posterior previene lesiones de hombro — no te lo saltes." },
+      { id:"encogimientos", name:"Encogimientos de Trapecios con Mancuernas", sets:3, reps:"15–20", rest:"45s", muscle:"Trapecio superior", equipment:"Mancuernas pesadas", type:"isolation",
+        tip:"Sube los hombros directamente hacia las orejas, sin rotar. Pausa 1 segundo arriba. Los trapecios aguantan mucho peso — usa mancuernas pesadas." },
+      { id:"plancha", name:"Plancha Abdominal con Variantes", sets:3, reps:"45 seg", rest:"30s", muscle:"Core completo — transverso + oblicuos", equipment:"Esterilla", type:"isolation",
+        tip:"Cuerpo en línea perfecta desde talones hasta cabeza. Para avanzar: toca el hombro alterno, o pon los pies en banco elevado. El core estabiliza todo lo demás." },
+      { id:"crunch_polea", name:"Crunch Abdominal en Polea", sets:3, reps:"15–20", rest:"45s", muscle:"Recto abdominal con resistencia", equipment:"Polea alta + cuerda Technogym", type:"isolation",
+        tip:"Rodillas en el suelo, cuerda detrás de la cabeza. Encoge el abdomen hacia abajo, no la cabeza hacia abajo. Mejor que los crunches en el suelo porque hay resistencia." },
+    ],
+    finisher: "Rueda abdominal (ab wheel) 3×10 si hay en el gimnasio — o plancha lateral 2×30 seg c/lado",
+  },
+];
+
+const DAY_MAP = { 1:"Lunes", 3:"Miércoles", 5:"Viernes", 6:"Sábado" };
+const REST_DAYS = {0:"Domingo 😴", 2:"Martes 😴", 4:"Jueves 😴"};
+
+// ══════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════
+let currentDayIdx = 0;
+let currentScreen = 'rutina';
+let historialDayIdx = 0;
+
+function getStorage(k, def) { try { return JSON.parse(localStorage.getItem(k)) || def; } catch { return def; } }
+function setStorage(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} }
+function todayKey() { return new Date().toISOString().split('T')[0]; }
+function sessionKey(dayName, date) { return `gym_${dayName}_${date}`; }
+
+// ══════════════════════════════════════════════
+// SCREEN
+// ══════════════════════════════════════════════
+function switchScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('screen-' + name).classList.add('active');
+  document.getElementById('nav-' + name).classList.add('active');
+  currentScreen = name;
+  if (name === 'historial') renderHistorial();
+  if (name === 'recup') renderRecup();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ══════════════════════════════════════════════
+// TABS
+// ══════════════════════════════════════════════
+function buildTabs() {
+  const wrap = document.getElementById('dayTabs');
+  SPLIT.forEach((s, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'day-tab' + (i === 0 ? ' active' : '');
+    btn.textContent = s.day;
+    if (i === 0) { btn.style.borderColor = s.color; btn.style.color = s.color; btn.style.background = s.color + '18'; }
+    btn.addEventListener('click', () => selectDay(i));
+    wrap.appendChild(btn);
+  });
+}
+
+function selectDay(i) {
+  currentDayIdx = i;
+  document.querySelectorAll('.day-tab').forEach((btn, idx) => {
+    const col = SPLIT[idx].color;
+    btn.classList.toggle('active', idx === i);
+    if (idx === i) { btn.style.borderColor = col; btn.style.color = col; btn.style.background = col + '18'; }
+    else { btn.style.borderColor = ''; btn.style.color = ''; btn.style.background = ''; }
+  });
+  renderSession();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ══════════════════════════════════════════════
+// RENDER SESSION
+// ══════════════════════════════════════════════
+function renderSession() {
+  const s = SPLIT[currentDayIdx];
+  const col = s.color;
+  const key = sessionKey(s.day, todayKey());
+  const sessionData = getStorage(key, {});
+  const doneCount = Object.values(sessionData).filter(v => v && v.done).length;
+  const totalSets = s.exercises.reduce((acc, e) => acc + e.sets, 0);
+  const doneSets = Object.values(sessionData).reduce((acc, v) => acc + (v ? (v.sets_done || 0) : 0), 0);
+  const pct = Math.min(100, Math.round((doneSets / totalSets) * 100));
+
+  document.getElementById('mainContent').innerHTML = `
+    <div class="session-card animate" style="background:${col}0d;border-color:${col}30">
+      <div class="session-meta">
+        <div class="session-tag" style="color:${col};border-color:${col}40;background:${col}10">${s.tag}</div>
+        <div style="font-family:'DM Mono',monospace;font-size:10px;color:var(--muted)">⏱ ${s.duration}</div>
+      </div>
+      <div class="session-title">${s.day}</div>
+      <div class="session-note">${s.note}</div>
+    </div>
+
+    <div class="session-progress animate">
+      <div class="session-progress-track">
+        <div class="session-progress-fill" style="width:${pct}%;background:${col}"></div>
+      </div>
+      <div class="session-progress-text">
+        <span>${doneSets} series completadas</span>
+        <span style="color:${col}">${pct}%</span>
+      </div>
+    </div>
+
+    <div class="warmup-bar animate">
+      <span style="font-size:16px">🔥</span>
+      <div>
+        <div style="font-family:'DM Mono',monospace;font-size:9px;color:#fbbf24;letter-spacing:1px;margin-bottom:4px">CALENTAMIENTO</div>
+        <div class="warmup-text">${s.warmup}</div>
+      </div>
+    </div>
+
+    ${s.exercises.map((ex, i) => renderExCard(ex, i, col, sessionData)).join('')}
+
+    <div class="finisher-card animate">
+      <span style="font-size:16px">🏁</span>
+      <div>
+        <div style="font-family:'DM Mono',monospace;font-size:9px;color:#a78bfa;letter-spacing:1px;margin-bottom:4px">FINISHER</div>
+        <div class="finisher-text">${s.finisher}</div>
+      </div>
+    </div>
+
+    <div class="progression-wrap animate">
+      <div class="section-label">📈 Progresión — Ciclo 8 Semanas</div>
+      ${[
+        {w:"Sem 1–2",col:"#38bdf8",label:"Adaptación",desc:"Aprende los movimientos. Técnica perfecta antes que peso."},
+        {w:"Sem 3–4",col:"#4ade80",label:"Carga",desc:"Sube 2.5–5kg si completas todas las reps con buena técnica."},
+        {w:"Sem 5–6",col:"#f97316",label:"Intensidad",desc:"Última serie al fallo. Añade 1 serie extra en compuestos."},
+        {w:"Sem 7–8",col:"#a78bfa",label:"Descarga",desc:"Baja el volumen 40%. El músculo crece en el descanso."},
+      ].map(p=>`
+        <div class="prog-row">
+          <div class="prog-week" style="color:${p.col};background:${p.col}15">${p.w}</div>
+          <div class="prog-text"><strong>${p.label}:</strong> ${p.desc}</div>
+        </div>`).join('')}
+    </div>
+  `;
+
+  // Add event listeners for set checkboxes
+  s.exercises.forEach(ex => {
+    for (let set = 1; set <= ex.sets; set++) {
+      const doneBtn = document.getElementById(`done_${ex.id}_${set}`);
+      if (doneBtn) {
+        doneBtn.addEventListener('click', () => toggleSet(ex.id, set, ex.sets, s.day));
+      }
+    }
+    // Expand/collapse
+    const card = document.getElementById(`excard_${ex.id}`);
+    if (card) {
+      card.querySelector('.ex-header').addEventListener('click', () => {
+        card.classList.toggle('expanded');
+      });
+    }
+  });
+}
+
+function renderExCard(ex, idx, col, sessionData) {
+  const exData = sessionData[ex.id] || {};
+  const typeLabel = ex.type === 'compound' ? 'COMPUESTO' : 'AISLAMIENTO';
+  const typeCol = ex.type === 'compound' ? '#f97316' : '#a78bfa';
+
+  // Check for PR
+  const allWeights = getStorage('gym_weights', {});
+  const history = allWeights[ex.id] || [];
+  const maxEver = history.length ? Math.max(...history.map(h => h.peso || 0)) : 0;
+
+  const setsHTML = Array.from({length: ex.sets}, (_, i) => {
+    const setNum = i + 1;
+    const isDone = exData[`set_${setNum}`] || false;
+    const savedPeso = exData[`peso_${setNum}`] || '';
+    return `
+    <div class="set-row">
+      <div class="set-num">Serie ${setNum}</div>
+      <input type="number" class="set-input" id="peso_${ex.id}_${setNum}" placeholder="kg" value="${savedPeso}"
+        onchange="savePeso('${ex.id}','${setNum}','${ex.sets}','${SPLIT[currentDayIdx].day}')"
+        onclick="event.stopPropagation()" step="2.5" min="0">
+      <div style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted);width:30px;text-align:center">${ex.reps}</div>
+      <button class="set-done ${isDone?'checked':''}" id="done_${ex.id}_${setNum}">
+        ${isDone?'✓':''}
+      </button>
+    </div>`;
+  }).join('');
+
+  return `
+  <div class="ex-card animate" id="excard_${ex.id}" style="animation-delay:${idx*0.04}s">
+    <div class="ex-header">
+      <div class="ex-num" style="background:${col}18;color:${col}">${idx+1}</div>
+      <div class="ex-info">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:3px">
+          <span style="font-family:'DM Mono',monospace;font-size:8px;color:${typeCol};background:${typeCol}15;padding:1px 5px;border-radius:3px">${typeLabel}</span>
+          <span style="font-family:'DM Mono',monospace;font-size:8px;color:var(--muted)">${ex.muscle}</span>
+        </div>
+        <div class="ex-name">${ex.name}</div>
+      </div>
+      <div class="ex-stats">
+        <div class="ex-stat"><div class="ex-stat-val" style="color:${col}">${ex.sets}</div><div class="ex-stat-lbl">Series</div></div>
+        <div class="ex-stat"><div class="ex-stat-val" style="color:${col}">${ex.reps}</div><div class="ex-stat-lbl">Reps</div></div>
+        <div class="ex-stat"><div class="ex-stat-val" style="color:${col}">${ex.rest}</div><div class="ex-stat-lbl">Descanso</div></div>
+      </div>
+    </div>
+    <div class="ex-detail">
+      <div class="ex-tip">
+        <div class="ex-tip-label">💬 TÉCNICA</div>
+        <div class="ex-tip-text">${ex.tip}</div>
+      </div>
+      <div class="ex-equipment" style="margin-top:8px">📦 ${ex.equipment}</div>
+      ${maxEver > 0 ? `<div style="margin-top:6px"><span class="pr-indicator">🏆 Tu PR: ${maxEver}kg</span></div>` : ''}
+      <div class="weight-logger" onclick="event.stopPropagation()">
+        <div class="weight-logger-title">
+          <span>📝 REGISTRAR SERIES HOY</span>
+          <span style="font-family:'DM Mono',monospace;font-size:9px;color:var(--muted)">${todayKey()}</span>
+        </div>
+        <div class="sets-grid">${setsHTML}</div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function toggleSet(exId, setNum, totalSets, dayName) {
+  const key = sessionKey(dayName, todayKey());
+  const data = getStorage(key, {});
+  if (!data[exId]) data[exId] = {};
+  data[exId][`set_${setNum}`] = !data[exId][`set_${setNum}`];
+  data[exId].sets_done = Object.keys(data[exId]).filter(k => k.startsWith('set_') && data[exId][k]).length;
+  data[exId].done = data[exId].sets_done === totalSets;
+  setStorage(key, data);
+  const btn = document.getElementById(`done_${exId}_${setNum}`);
+  if (btn) {
+    btn.classList.toggle('checked', data[exId][`set_${setNum}`]);
+    btn.textContent = data[exId][`set_${setNum}`] ? '✓' : '';
+  }
+  // Update progress bar
+  const s = SPLIT[currentDayIdx];
+  const totalSetsAll = s.exercises.reduce((acc, e) => acc + e.sets, 0);
+  const doneSets = Object.values(data).reduce((acc, v) => acc + (v ? (v.sets_done || 0) : 0), 0);
+  const pct = Math.min(100, Math.round((doneSets / totalSetsAll) * 100));
+  const fill = document.querySelector('.session-progress-fill');
+  const text = document.querySelector('.session-progress-text');
+  if (fill) fill.style.width = pct + '%';
+  if (text) text.innerHTML = `<span>${doneSets} series completadas</span><span style="color:${s.color}">${pct}%</span>`;
+}
+
+function savePeso(exId, setNum, totalSets, dayName) {
+  const key = sessionKey(dayName, todayKey());
+  const data = getStorage(key, {});
+  if (!data[exId]) data[exId] = {};
+  const inputEl = document.getElementById(`peso_${exId}_${setNum}`);
+  if (!inputEl) return;
+  const val = parseFloat(inputEl.value);
+  data[exId][`peso_${setNum}`] = val || '';
+  setStorage(key, data);
+  // Save to weight history for PRs
+  if (val > 0) {
+    const allWeights = getStorage('gym_weights', {});
+    if (!allWeights[exId]) allWeights[exId] = [];
+    const existing = allWeights[exId].findIndex(h => h.date === todayKey());
+    if (existing >= 0) { if (val > allWeights[exId][existing].peso) allWeights[exId][existing].peso = val; }
+    else allWeights[exId].unshift({ date: todayKey(), peso: val });
+    allWeights[exId] = allWeights[exId].slice(0, 50);
+    setStorage('gym_weights', allWeights);
+  }
+}
+
+// ══════════════════════════════════════════════
+// HISTORIAL
+// ══════════════════════════════════════════════
+function renderHistorial() {
+  const selWrap = document.getElementById('historialDaySel');
+  selWrap.innerHTML = SPLIT.map((s, i) => `
+    <button class="hist-day-btn ${i===historialDayIdx?'active':''}"
+      style="${i===historialDayIdx?`color:${s.color};border-color:${s.color};background:${s.color}12`:''}"
+      onclick="selectHistDay(${i})">${s.day}</button>`).join('');
+  renderHistorialContent();
+}
+
+function selectHistDay(i) {
+  historialDayIdx = i;
+  renderHistorial();
+}
+
+function renderHistorialContent() {
+  const s = SPLIT[historialDayIdx];
+  const wrap = document.getElementById('historialContent');
+  // Gather all session keys for this day
+  const allKeys = [];
+  try {
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (k && k.startsWith(`gym_${s.day}_`)) allKeys.push(k);
+    }
+  } catch {}
+  allKeys.sort().reverse();
+  if (!allKeys.length) {
+    wrap.innerHTML = '<div class="empty-state">Aún no hay sesiones registradas para este día.<br>Completa tu primera sesión y aparecerá aquí.</div>';
+    return;
+  }
+  wrap.innerHTML = allKeys.slice(0, 10).map(k => {
+    const date = k.replace(`gym_${s.day}_`, '');
+    const data = getStorage(k, {});
+    const d = new Date(date + 'T12:00:00');
+    const label = d.toLocaleDateString('es-ES', {weekday:'long', day:'numeric', month:'long'});
+    const exRows = s.exercises.map(ex => {
+      const exData = data[ex.id] || {};
+      const weights = Array.from({length: ex.sets}, (_, i) => exData[`peso_${i+1}`]).filter(Boolean);
+      const maxW = weights.length ? Math.max(...weights) : null;
+      const doneS = exData.sets_done || 0;
+      return `
+      <div class="hist-ex-row">
+        <div class="hist-ex-name">${ex.name}</div>
+        <div class="hist-ex-vals">${maxW ? maxW+'kg · ' : ''}${doneS}/${ex.sets} series</div>
+      </div>`;
+    }).join('');
+    const allDone = s.exercises.reduce((acc,e) => acc + (data[e.id]?.sets_done||0), 0);
+    const allTotal = s.exercises.reduce((acc,e) => acc + e.sets, 0);
+    return `
+    <div class="hist-session animate">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <div class="hist-session-date">${label}</div>
+        <div style="font-family:'DM Mono',monospace;font-size:10px;color:${s.color}">${allDone}/${allTotal} series</div>
+      </div>
+      ${exRows}
+    </div>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════════════
+// RECUPERACIÓN
+// ══════════════════════════════════════════════
+const WEEK_RECUP = [
+  {
+    day:"Lun", label:"Gym", icon:"🏋️", type:"gym",
+    color:"#38bdf8",
+    recommendation:"post-gym",
+    therapies:[
+      { name:"Sauna Seca", icon:"🌡️", color:"#f97316", duration:15, cycles:2,
+        desc:"Post-entreno espalda y bíceps. El calor elimina el lactato acumulado y dispara la hormona del crecimiento.",
+        protocol:[
+          {text:"Ducha rápida antes de entrar",time:"2 min"},
+          {text:"Primera ronda en sauna",time:"10–12 min"},
+          {text:"Ducha fría o zona fría",time:"2 min"},
+          {text:"Segunda ronda en sauna",time:"10–12 min"},
+          {text:"Ducha fría final + hidratación",time:"5 min"},
+        ],
+        tip:"Entra bien hidratado. Lleva agua dentro. Si notas mareo sal inmediatamente."
+      },
+      { name:"Hidromasaje", icon:"🫧", color:"#38bdf8", duration:10, cycles:1,
+        desc:"Opcional después de la sauna. Los jets en la espalda media son perfectos tras el remo.",
+        protocol:[
+          {text:"Entra tras la sauna o solo",time:"—"},
+          {text:"Jets enfocados en espalda baja y trapecios",time:"10 min"},
+          {text:"Hidratación post",time:"—"},
+        ],
+        tip:"El agua caliente del hidromasaje tras la sauna potencia la relajación muscular."
+      },
+    ]
+  },
+  {
+    day:"Mar", label:"Descanso", icon:"😴", type:"rest",
+    color:"#34d399",
+    recommendation:"descanso-activo",
+    therapies:[
+      { name:"Baño Turco", icon:"💧", color:"#34d399", duration:20, cycles:1,
+        desc:"Día de descanso activo. Más suave que la sauna. Ideal para relajar dorsales y bíceps del lunes.",
+        protocol:[
+          {text:"Ducha rápida de entrada",time:"2 min"},
+          {text:"Baño turco — temperatura moderada",time:"15–20 min"},
+          {text:"Ducha templada (no fría)",time:"3 min"},
+          {text:"Hidratación 500ml",time:"—"},
+        ],
+        tip:"El vapor húmedo mejora la respiración y la circulación sin el shock térmico de la sauna."
+      },
+      { name:"Hidromasaje", icon:"🫧", color:"#38bdf8", duration:15, cycles:1,
+        desc:"Perfecto después del baño turco. Recuperación pasiva total.",
+        protocol:[
+          {text:"Tras el baño turco o solo",time:"—"},
+          {text:"15 min de jets en cuerpo completo",time:"15 min"},
+          {text:"Especial atención a zona lumbar",time:"—"},
+        ],
+        tip:"Hoy no hay prisa. Aprovecha para hacer el protocolo completo."
+      },
+    ]
+  },
+  {
+    day:"Mié", label:"Gym", icon:"🏋️", type:"gym",
+    color:"#f97316",
+    recommendation:"post-gym",
+    therapies:[
+      { name:"Sauna Seca", icon:"🌡️", color:"#f97316", duration:15, cycles:2,
+        desc:"Post-entreno pecho y tríceps. El calor relaja el pectoral y los deltoides anteriores.",
+        protocol:[
+          {text:"Ducha antes de entrar",time:"2 min"},
+          {text:"Primera ronda sauna",time:"10–12 min"},
+          {text:"Ducha fría",time:"2 min"},
+          {text:"Segunda ronda sauna",time:"10–12 min"},
+          {text:"Ducha fría + estiramientos pecho",time:"5 min"},
+        ],
+        tip:"Después del press banca el pectoral está muy contracturado. El calor lo relaja más que cualquier estiramiento."
+      },
+    ]
+  },
+  {
+    day:"Jue", label:"Descanso", icon:"😴", type:"rest",
+    color:"#a78bfa",
+    recommendation:"descanso-activo",
+    therapies:[
+      { name:"Hidromasaje", icon:"🫧", color:"#38bdf8", duration:15, cycles:1,
+        desc:"Descanso ligero. Solo hidromasaje hoy — recuperación suave antes del día de piernas.",
+        protocol:[
+          {text:"15 min de jets relajantes",time:"15 min"},
+          {text:"Jets en zona lumbar y piernas",time:"—"},
+          {text:"Hidratación normal",time:"—"},
+        ],
+        tip:"Jueves es el día más suave. No sobrecargues la recuperación — mañana es piernas."
+      },
+    ]
+  },
+  {
+    day:"Vie", label:"Gym", icon:"🏋️", type:"gym",
+    color:"#4ade80",
+    recommendation:"cuidado-piernas",
+    therapies:[
+      { name:"Hidromasaje", icon:"🫧", color:"#38bdf8", duration:15, cycles:1,
+        desc:"⚠️ Solo hidromasaje tras piernas. La sauna con piernas muy cargadas puede provocar mareo o hipotensión.",
+        protocol:[
+          {text:"Espera 20 min post-entreno",time:"20 min"},
+          {text:"Ducha templada primero",time:"3 min"},
+          {text:"Hidromasaje enfocado en piernas",time:"15 min"},
+          {text:"Hidratación 500ml mínimo",time:"—"},
+        ],
+        tip:"Guarda la sauna para mañana sábado — las piernas necesitan bajar de temperatura primero."
+      },
+      { name:"Sauna Sábado ↗", icon:"🌡️", color:"#f97316", duration:0, cycles:0,
+        desc:"La sauna de las piernas es mañana sábado. Así dejas 12–14h de recuperación antes del calor.",
+        protocol:[
+          {text:"Sábado: sauna protocolo completo",time:"30 min"},
+        ],
+        tip:"Paciencia. Hacer la sauna hoy con piernas al límite no es inteligente."
+      },
+    ]
+  },
+  {
+    day:"Sáb", label:"Gym", icon:"🏋️", type:"gym",
+    color:"#a78bfa",
+    recommendation:"post-gym",
+    therapies:[
+      { name:"Sauna Seca", icon:"🌡️", color:"#f97316", duration:15, cycles:3,
+        desc:"Mejor día para la sauna larga. Post-hombros + recuperación de piernas del viernes. Protocolo completo.",
+        protocol:[
+          {text:"Ducha antes",time:"2 min"},
+          {text:"Primera ronda sauna",time:"12 min"},
+          {text:"Ducha fría",time:"2 min"},
+          {text:"Segunda ronda sauna",time:"12 min"},
+          {text:"Baño turco",time:"10 min"},
+          {text:"Tercera ronda sauna o hidromasaje",time:"12 min"},
+          {text:"Ducha fría final",time:"3 min"},
+        ],
+        tip:"Sábado es el día sin compromisos deportivos al día siguiente. Haz el protocolo más largo de la semana."
+      },
+      { name:"Baño Turco", icon:"💧", color:"#34d399", duration:15, cycles:1,
+        desc:"Combínalo con la sauna sábado para el protocolo de recuperación más completo.",
+        protocol:[
+          {text:"Entre rondas de sauna",time:"10–15 min"},
+          {text:"Hidratación constante",time:"—"},
+        ],
+        tip:"Calor seco + calor húmedo en el mismo día = recuperación de élite."
+      },
+    ]
+  },
+  {
+    day:"Dom", label:"Descanso", icon:"😴", type:"rest",
+    color:"#64748b",
+    recommendation:"descanso-total",
+    therapies:[
+      { name:"Spa libre", icon:"🛁", color:"#64748b", duration:20, cycles:1,
+        desc:"Descanso total. Si vas al Enjoy, aprovecha el spa sin protocolo específico — solo disfruta.",
+        protocol:[
+          {text:"Sin estructura. Lo que apetezca.",time:"—"},
+          {text:"Hidromasaje, sauna suave, baño turco",time:"A gusto"},
+          {text:"Hidratación y relajación",time:"—"},
+        ],
+        tip:"El descanso mental también es recuperación. No todo tiene que ser protocolo."
+      },
+    ]
+  },
+];
+
+let recupDayIdx = new Date().getDay() === 0 ? 6 : new Date().getDay() - 1;
+let timerInterval = null;
+let timerSeconds = 0;
+let timerRunning = false;
+let timerCycles = 0;
+let timerMaxCycles = 1;
+let timerPhaseHeat = true;
+
+function renderRecup() {
+  const wrap = document.getElementById('weekGrid');
+  wrap.innerHTML = WEEK_RECUP.map((d, i) => `
+    <div class="week-cell ${i===recupDayIdx?'active-day':''}"
+      style="${i===recupDayIdx?`border-color:${d.color};background:${d.color}12`:''}"
+      onclick="selectRecupDay(${i})">
+      <div class="week-cell-day" style="${i===recupDayIdx?`color:${d.color}`:''}">${d.day}</div>
+      <div class="week-cell-icon">${d.icon}</div>
+      <div class="week-cell-label" style="${i===recupDayIdx?`color:${d.color}`:''}">${d.label}</div>
+    </div>`).join('');
+  renderRecupDay();
+}
+
+function selectRecupDay(i) {
+  recupDayIdx = i;
+  clearTimer();
+  renderRecup();
+  document.getElementById('recupDayContent').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function renderRecupDay() {
+  const d = WEEK_RECUP[recupDayIdx];
+  const recTypeLabels = {
+    'post-gym':'✅ Post-entreno — ideal para hoy',
+    'descanso-activo':'💤 Descanso activo — recuperación óptima',
+    'cuidado-piernas':'⚠️ Precaución — piernas cargadas',
+    'descanso-total':'😴 Descanso total — sin estructura',
+  };
+  const wrap = document.getElementById('recupDayContent');
+  wrap.innerHTML = `
+    <div style="margin-bottom:14px;padding:8px 12px;border-radius:8px;background:${d.color}12;border:1px solid ${d.color}30;font-family:'DM Mono',monospace;font-size:10px;color:${d.color}">
+      ${recTypeLabels[d.recommendation] || ''}
+    </div>
+    ${d.therapies.map((t, ti) => renderTherapyCard(t, ti, d.color)).join('')}
+    <div class="recup-tip" style="margin-top:4px">
+      💧 Hidratación clave hoy — bebe 500ml extra por cada sesión de calor que hagas.
+    </div>`;
+}
+
+function renderTherapyCard(t, ti, dayColor) {
+  if (t.duration === 0) {
+    return `
+    <div class="recup-card animate" style="background:${t.color}08;border-color:${t.color}25;animation-delay:${ti*0.08}s">
+      <div class="recup-card-title">${t.icon} ${t.name}</div>
+      <div class="recup-card-desc">${t.desc}</div>
+      <div class="recup-protocol">
+        ${t.protocol.map((s,si) => `
+        <div class="recup-step">
+          <div class="recup-step-num">${si+1}</div>
+          <div class="recup-step-text">${s.text}</div>
+          <div class="recup-step-time" style="color:${t.color}">${s.time}</div>
+        </div>`).join('')}
+      </div>
+      ${t.tip?`<div class="recup-tip">${t.tip}</div>`:''}
+    </div>`;
+  }
+  return `
+  <div class="recup-card animate" style="background:${t.color}08;border-color:${t.color}25;animation-delay:${ti*0.08}s">
+    <div class="recup-card-title">${t.icon} ${t.name}
+      <span style="font-family:'DM Mono',monospace;font-size:9px;color:${t.color};background:${t.color}15;padding:2px 8px;border-radius:4px">${t.duration} min · ${t.cycles} ${t.cycles>1?'ciclos':'ciclo'}</span>
+    </div>
+    <div class="recup-card-desc">${t.desc}</div>
+    <div class="recup-protocol">
+      ${t.protocol.map((s,si) => `
+      <div class="recup-step">
+        <div class="recup-step-num">${si+1}</div>
+        <div class="recup-step-text">${s.text}</div>
+        <div class="recup-step-time" style="color:${t.color}">${s.time}</div>
+      </div>`).join('')}
+    </div>
+    ${t.tip?`<div class="recup-tip">${t.tip}</div>`:''}
+    <div class="timer-wrap" style="margin-top:12px">
+      <div class="timer-label">⏱ TEMPORIZADOR</div>
+      <div class="timer-display" id="timerDisp_${ti}" style="color:${t.color}">
+        ${String(Math.floor(t.duration)).padStart(2,'0')}:00
+      </div>
+      <div class="timer-phase" id="timerPhase_${ti}">Listo para comenzar</div>
+      <div class="timer-btns">
+        <button class="timer-btn" id="timerBtn_${ti}"
+          style="background:${t.color}20;border-color:${t.color};color:${t.color}"
+          onclick="toggleTimer(${ti},${t.duration*60},${t.cycles},'${t.color}')">
+          ▶ Iniciar
+        </button>
+        <button class="timer-btn"
+          style="background:rgba(255,255,255,0.04);border-color:var(--border);color:var(--muted)"
+          onclick="resetTimer(${ti},${t.duration*60})">
+          ↺ Reset
+        </button>
+      </div>
+      <div class="timer-cycles" id="timerCycles_${ti}">
+        ${Array.from({length:t.cycles},(_,ci)=>`
+          <div class="cycle-dot" id="cycleDot_${ti}_${ci}"
+            style="border-color:${t.color}"></div>`).join('')}
+      </div>
+    </div>
+  </div>`;
+}
+
+let activeTimerIdx = null;
+
+function toggleTimer(idx, totalSeconds, maxCycles) {
+  if (activeTimerIdx !== null && activeTimerIdx !== idx) {
+    resetTimer(activeTimerIdx, timerSeconds);
+  }
+  if (timerRunning && activeTimerIdx === idx) {
+    pauseTimer(idx);
+    return;
+  }
+  activeTimerIdx = idx;
+  if (timerSeconds === 0 || timerSeconds === totalSeconds) {
+    timerSeconds = totalSeconds;
+    timerCycles = 0;
+    timerMaxCycles = maxCycles;
+  }
+  timerRunning = true;
+  const btn = document.getElementById(`timerBtn_${idx}`);
+  if (btn) btn.textContent = '⏸ Pausar';
+
+  timerInterval = setInterval(() => {
+    timerSeconds--;
+    updateTimerDisplay(idx, totalSeconds);
+    if (timerSeconds <= 0) {
+      clearInterval(timerInterval);
+      timerCycles++;
+      const dot = document.getElementById(`cycleDot_${idx}_${timerCycles-1}`);
+      if (dot) { dot.classList.add('done'); dot.style.background = dot.style.borderColor || '#4ade80'; }
+      if (timerCycles >= timerMaxCycles) {
+        timerRunning = false;
+        const ph = document.getElementById(`timerPhase_${idx}`);
+        if (ph) ph.textContent = '✅ Sesión completada — ¡bien hecho!';
+        if (btn) btn.textContent = '✅ Completado';
+        // Vibrate if available
+        if (navigator.vibrate) navigator.vibrate([300,100,300]);
+      } else {
+        timerSeconds = 120; // 2 min cold shower
+        const ph = document.getElementById(`timerPhase_${idx}`);
+        if (ph) { ph.textContent = '🚿 Ducha fría — 2 min'; ph.classList.add('timer-pulse'); }
+        setTimeout(() => {
+          if (ph) ph.classList.remove('timer-pulse');
+          timerSeconds = totalSeconds;
+          timerRunning = true;
+          timerInterval = setInterval(() => {
+            timerSeconds--;
+            updateTimerDisplay(idx, totalSeconds);
+            if (timerSeconds <= 0) { clearInterval(timerInterval); timerRunning = false; }
+          }, 1000);
+        }, 120000);
+      }
+    }
+  }, 1000);
+}
+
+function updateTimerDisplay(idx, totalSeconds) {
+  const mins = Math.floor(timerSeconds / 60);
+  const secs = timerSeconds % 60;
+  const disp = document.getElementById(`timerDisp_${idx}`);
+  if (disp) disp.textContent = `${String(mins).padStart(2,'0')}:${String(secs).padStart(2,'0')}`;
+  const ph = document.getElementById(`timerPhase_${idx}`);
+  if (ph && timerSeconds > 0) {
+    const pct = Math.round(((totalSeconds - timerSeconds) / totalSeconds) * 100);
+    if (!ph.textContent.includes('Ducha')) ph.textContent = `Ciclo ${timerCycles+1} — ${pct}% completado`;
+  }
+}
+
+function pauseTimer(idx) {
+  clearInterval(timerInterval);
+  timerRunning = false;
+  const btn = document.getElementById(`timerBtn_${idx}`);
+  if (btn) btn.textContent = '▶ Continuar';
+  const ph = document.getElementById(`timerPhase_${idx}`);
+  if (ph) ph.textContent = '⏸ Pausado';
+}
+
+function resetTimer(idx, totalSeconds) {
+  clearInterval(timerInterval);
+  timerRunning = false;
+  timerSeconds = totalSeconds;
+  timerCycles = 0;
+  activeTimerIdx = null;
+  const disp = document.getElementById(`timerDisp_${idx}`);
+  if (disp) {
+    const mins = Math.floor(totalSeconds / 60);
+    disp.textContent = `${String(mins).padStart(2,'0')}:00`;
+  }
+  const ph = document.getElementById(`timerPhase_${idx}`);
+  if (ph) ph.textContent = 'Listo para comenzar';
+  const btn = document.getElementById(`timerBtn_${idx}`);
+  if (btn) btn.textContent = '▶ Iniciar';
+  // Reset cycle dots
+  document.querySelectorAll(`[id^="cycleDot_${idx}_"]`).forEach(dot => {
+    dot.classList.remove('done');
+    dot.style.background = '';
+  });
+}
+
+function clearTimer() {
+  clearInterval(timerInterval);
+  timerRunning = false;
+  timerSeconds = 0;
+  activeTimerIdx = null;
+}
+buildTabs();
+// Auto-select today's day if it's a gym day
+const todayDow = new Date().getDay(); // 0=Dom,1=Lun...
+const todayDayName = DAY_MAP[todayDow];
+if (todayDayName) {
+  const idx = SPLIT.findIndex(s => s.day === todayDayName);
+  if (idx >= 0) selectDay(idx); else renderSession();
+} else {
+  renderSession();
+}
+
+// PWA — solo registra SW en hosting real, no en preview
+if ('serviceWorker' in navigator && !location.hostname.includes('claudeusercontent')) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js')
+      .then(() => console.log('✅ PWA lista'))
+      .catch(err => console.log('SW no disponible en preview:', err.message));
+  });
+}
+</script>
+</body>
+</html>
